@@ -1,0 +1,21 @@
+name: Unpack Device Tree
+on:
+  workflow_dispatch:
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and Organize
+        run: |
+          unzip -q device-tree.zip -d temp_dt
+          SUBDIR=$(find temp_dt -name "BoardConfig.mk" -exec dirname {} \;)
+          cp -r "$SUBDIR"/* .
+          rm -rf temp_dt device-tree.zip
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Unpack device tree with folder structure"
+          git push
